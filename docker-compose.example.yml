@@ -8,9 +8,9 @@ services:
     image: your-registry/your-repo:latest
     restart: unless-stopped
 
-  # Container-Auto-Update watcher
-  container-auto-update:
-    image: ghcr.io/omaraboulmakarem/container-auto-update:latest
+  # Container-Auto-Updater watcher
+  container-auto-updater:
+    image: ghcr.io/omaraboulmakarem/container-auto-updater:latest
     restart: unless-stopped
     read_only: true
     cap_drop:

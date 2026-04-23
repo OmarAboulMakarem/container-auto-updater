@@ -92,7 +92,7 @@ while true; do
 
     if $redeploy_ok; then
       log info "Redeploy succeeded" image "$image_ref"
-      subject="[auto-pull] $COMPOSE_PROJECT — redeployed successfully"
+      subject="[container-updater] $COMPOSE_PROJECT — redeployed successfully"
       body="$(printf \
 'Project : %s
 Time    : %s
@@ -113,7 +113,7 @@ All containers are running:
     # ── Redeploy failed — send initial failure email then attempt recovery ─────
     log warn "Initial redeploy failed, sending failure email and starting recovery" image "$image_ref"
 
-    subject="[auto-pull] $COMPOSE_PROJECT — REDEPLOY FAILED"
+    subject="[container-updater] $COMPOSE_PROJECT — REDEPLOY FAILED"
     body="$(printf \
 'Project : %s
 Time    : %s
@@ -155,7 +155,7 @@ Recovery in progress: will recheck in 2 min, then force-recreate if still unheal
       case "$retry_outcome" in
         recovered_on_own)
           log info "Services recovered on their own during retry wait" image "$image_ref"
-          subject="[auto-pull] $COMPOSE_PROJECT — recovered automatically"
+          subject="[container-updater] $COMPOSE_PROJECT — recovered automatically"
           body="$(printf \
 'Project : %s
 Time    : %s
@@ -172,7 +172,7 @@ Current container status:
           ;;
         force_recreate_succeeded)
           log info "Force-recreate succeeded" image "$image_ref"
-          subject="[auto-pull] $COMPOSE_PROJECT — recovered via force-recreate"
+          subject="[container-updater] $COMPOSE_PROJECT — recovered via force-recreate"
           body="$(printf \
 'Project : %s
 Time    : %s
@@ -194,13 +194,13 @@ Current container status:
           ;;
         *)
           log warn "Retry succeeded but outcome unclear" image "$image_ref" outcome "$retry_outcome"
-          subject="[auto-pull] $COMPOSE_PROJECT — recovered (outcome: $retry_outcome)"
+          subject="[container-updater] $COMPOSE_PROJECT — recovered (outcome: $retry_outcome)"
           body="$(compose_status "$COMPOSE_FILE")"
           ;;
       esac
     else
       log error "Recovery failed — services still unhealthy after force-recreate" image "$image_ref"
-      subject="[auto-pull] $COMPOSE_PROJECT — STILL FAILING after force-recreate"
+      subject="[container-updater] $COMPOSE_PROJECT — STILL FAILING after force-recreate"
       body="$(printf \
 'Project : %s
 Time    : %s

@@ -13,7 +13,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: omaraboulmakarem/container-auto-update
+  IMAGE_NAME: omaraboulmakarem/container-auto-updater
 
 jobs:
   build:

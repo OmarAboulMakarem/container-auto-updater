@@ -1,4 +1,4 @@
-# Container-Auto-Update
+# Container-Auto-Updater
 
 A lightweight container that watches private Docker registries (AWS ECR, Oracle OCIR, Docker Hub) for image updates and automatically redeploys your `docker compose` stack when a new digest is detected.
 
@@ -11,14 +11,14 @@ Similar to [Watchtower](https://containrrr.dev/watchtower/) or [WUD](https://get
 ### Pull the image
 
 ```bash
-docker pull ghcr.io/omaraboulmakarem/container-auto-update:latest
+docker pull ghcr.io/omaraboulmakarem/container-auto-updater:latest
 ```
 
 ### Run standalone (minimal)
 
 ```bash
 docker run -d \
-  --name container-auto-update \
+  --name container-auto-updater \
   --restart unless-stopped \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /path/to/your/docker-compose.yml:/compose/docker-compose.yml:ro \
@@ -32,7 +32,7 @@ docker run -d \
   -e SMTP_PORT="587" \
   -e SMTP_USERNAME="alerts@yourdomain.com" \
   -e SMTP_PASSWORD="yourpassword" \
-  ghcr.io/omaraboulmakarem/container-auto-update:latest
+  ghcr.io/omaraboulmakarem/container-auto-updater:latest
 ```
 
 ### Run with an env file
@@ -42,12 +42,12 @@ cp .env.example .env
 # edit .env with your values
 
 docker run -d \
-  --name container-auto-update \
+  --name container-auto-updater \
   --restart unless-stopped \
   --env-file .env \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /path/to/your/docker-compose.yml:/compose/docker-compose.yml:ro \
-  ghcr.io/omaraboulmakarem/container-auto-update:latest
+  ghcr.io/omaraboulmakarem/container-auto-updater:latest
 ```
 
 ### Run with Docker Compose
@@ -60,8 +60,8 @@ services:
     image: ghcr.io/youruser/yourapp:latest
     restart: unless-stopped
 
-  container-auto-update:
-    image: ghcr.io/omaraboulmakarem/container-auto-update:latest
+  container-auto-updater:
+    image: ghcr.io/omaraboulmakarem/container-auto-updater:latest
     restart: unless-stopped
     read_only: true
     cap_drop:
@@ -75,8 +75,8 @@ services:
 Then start it:
 
 ```bash
-docker compose up -d container-auto-update
-docker compose logs -f container-auto-update
+docker compose up -d container-auto-updater
+docker compose logs -f container-auto-updater
 ```
 
 See `docker-compose.example.yml` in this repo for a fully annotated example with all environment variables.
@@ -198,11 +198,11 @@ The registry is detected automatically from the image hostname — no config nee
 
 | Event | Subject | Body contains |
 |---|---|---|
-| Redeploy succeeded | `[CAU] <project> — redeployed successfully` | Image ref, old/new digest, timestamp, container status table |
-| Redeploy failed | `[CAU] <project> — REDEPLOY FAILED` | Status table, redeploy output, last 20 lines of logs per failing service, recovery notice |
-| Recovered automatically | `[CAU] <project> — recovered automatically` | Status table |
-| Recovered via force-recreate | `[CAU] <project> — recovered via force-recreate` | Force-recreate output, status table |
-| Still failing after all attempts | `[CAU] <project> — STILL FAILING after force-recreate` | Status table, last 20 lines of logs per failing service |
+| Redeploy succeeded | `[CU] <project> — redeployed successfully` | Image ref, old/new digest, timestamp, container status table |
+| Redeploy failed | `[CU] <project> — REDEPLOY FAILED` | Status table, redeploy output, last 20 lines of logs per failing service, recovery notice |
+| Recovered automatically | `[CU] <project> — recovered automatically` | Status table |
+| Recovered via force-recreate | `[CU] <project> — recovered via force-recreate` | Force-recreate output, status table |
+| Still failing after all attempts | `[CU] <project> — STILL FAILING after force-recreate` | Status table, last 20 lines of logs per failing service |
 
 A notification failure is logged but never crashes the watcher.
 
@@ -225,9 +225,9 @@ Logs are structured JSON, readable by Datadog, CloudWatch, Loki, and similar too
 ## Building from source
 
 ```bash
-git clone https://github.com/omaraboulmakarem/container-auto-update.git
-cd container-auto-update
-docker build -t container-auto-update:local .
+git clone https://github.com/omaraboulmakarem/container-auto-updater.git
+cd container-auto-updater
+docker build -t container-auto-updater:local .
 ```
 
 ---
@@ -238,7 +238,7 @@ The `.gitlab-ci.yml` builds and pushes on every push to `main`, `master`, `devel
 
 | Registry | Tags pushed |
 |---|---|
-| `ghcr.io/omaraboulmakarem/container-auto-update` | `latest`, `1.0.<pipeline_iid>` |
+| `ghcr.io/omaraboulmakarem/container-auto-updater` | `latest`, `1.0.<pipeline_iid>` |
 
 **Required GitLab CI/CD variables** (masked, expand variables OFF):
 
