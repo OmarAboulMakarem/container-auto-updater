@@ -19,7 +19,7 @@ fi
 
 INTERVAL_SECONDS=$(( ${CHECK_INTERVAL_MINUTES:-5} * 60 ))
 # Allow explicit project name override; fall back to parent dir of compose file
-COMPOSE_PROJECT="${CAU_PROJECT_NAME:-$(basename "$(dirname "$COMPOSE_FILE")")}"
+COMPOSE_PROJECT="${CA_UPDATER_PROJECT_NAME:-$(basename "$(dirname "$COMPOSE_FILE")")}"
 SKIP_FIRST_RUN="${SKIP_FIRST_RUN:-false}"
 
 log() {

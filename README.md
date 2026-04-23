@@ -24,7 +24,7 @@ docker run -d \
   -v /path/to/your/docker-compose.yml:/compose/docker-compose.yml:ro \
   -e WATCH_IMAGES="ghcr.io/youruser/yourapp:latest" \
   -e COMPOSE_FILE="/compose/docker-compose.yml" \
-  -e CAU_PROJECT_NAME="my-app" \
+  -e CA_UPDATER_PROJECT_NAME="my-app" \
   -e NOTIFY_PROVIDER="smtp" \
   -e EMAIL_FROM="alerts@yourdomain.com" \
   -e EMAIL_TO="ops@yourdomain.com" \
@@ -136,7 +136,7 @@ The registry is detected automatically from the image hostname — no config nee
 
 | Variable | Default | Description |
 |---|---|---|
-| `CAU_PROJECT_NAME` | Parent dir of `COMPOSE_FILE` | Project name shown in email subjects. Set this explicitly — the default resolves to `compose` when using the recommended mount path. |
+| `CA_UPDATER_PROJECT_NAME` | Parent dir of `COMPOSE_FILE` | Project name shown in email subjects. Set this explicitly — the default resolves to `compose` when using the recommended mount path. |
 | `CHECK_INTERVAL_MINUTES` | `5` | How often to poll registries, in minutes |
 | `SKIP_FIRST_RUN` | `false` | Set to `true` to skip the redeploy check on first startup, preventing a spurious redeploy every time the watcher container restarts |
 

@@ -8,7 +8,7 @@ services:
     image: your-registry/your-repo:latest
     restart: unless-stopped
 
-  # Container-Auto-Updater watcher
+  # container-auto-updater watcher
   container-auto-updater:
     image: ghcr.io/omaraboulmakarem/container-auto-updater:latest
     restart: unless-stopped
@@ -22,7 +22,7 @@ services:
     environment:
       WATCH_IMAGES: "your-registry/your-repo:latest"
       COMPOSE_FILE: "/compose/docker-compose.yml"
-      CAU_PROJECT_NAME: "my-app"
+      CA_UPDATER_PROJECT_NAME: "my-app"
       CHECK_INTERVAL_MINUTES: "5"
       SKIP_FIRST_RUN: "true"
       SENDGRID_API_KEY: "${SENDGRID_API_KEY}"
