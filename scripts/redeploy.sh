@@ -2,9 +2,19 @@
 set -euo pipefail
 
 # Prints a human-readable table of all services: NAME  STATE  HEALTH  PORTS
+_compose() {
+  local compose_file="$1"
+  shift
+  if [ -n "${COMPOSE_ENV_FILE:-}" ]; then
+    docker compose -f "$compose_file" --env-file "$COMPOSE_ENV_FILE" "$@"
+  else
+    docker compose -f "$compose_file" "$@"
+  fi
+}
+
 compose_status() {
   local compose_file="$1"
-  docker compose -f "$compose_file" ps --format json 2>/dev/null \
+  _compose "$compose_file" ps --format json 2>/dev/null \
     | jq -r 'if type == "array" then .[] else . end
              | [.Name, .State, (if .Health == "" then "-" else .Health end), (if .Publishers then (.Publishers | map(.PublishedPort | tostring) | join(",")) else "-" end)]
              | @tsv' \
@@ -18,27 +28,27 @@ failing_service_logs() {
   local compose_file="$1"
   local lines="${2:-20}"
   local services
-  services="$(docker compose -f "$compose_file" ps --format json 2>/dev/null \
+  services="$(_compose "$compose_file" ps --format json 2>/dev/null \
     | jq -r 'if type == "array" then .[] else . end
              | select((.State != "running") or (.Health == "unhealthy"))
              | .Service' \
     | sort -u | grep -v '^$' || true)"
 
   if [ -z "$services" ]; then
-    docker compose -f "$compose_file" logs --tail="$lines" 2>&1
+    _compose "$compose_file" logs --tail="$lines" 2>&1
     return
   fi
 
   while IFS= read -r svc; do
     printf '\n--- logs: %s (last %s lines) ---\n' "$svc" "$lines"
-    docker compose -f "$compose_file" logs --tail="$lines" "$svc" 2>&1
+    _compose "$compose_file" logs --tail="$lines" "$svc" 2>&1
   done <<< "$services"
 }
 
 verify_health() {
   local compose_file="$1"
   local unhealthy
-  unhealthy="$(docker compose -f "$compose_file" ps --format json 2>/dev/null \
+  unhealthy="$(_compose "$compose_file" ps --format json 2>/dev/null \
     | jq -r 'if type == "array" then .[] else . end
              | select((.State != "running") or (.Health == "unhealthy"))
              | .Name' \
@@ -57,14 +67,14 @@ do_redeploy() {
   local pull_output up_output
 
   echo "[redeploy] Pulling images..."
-  if ! pull_output="$(docker compose -f "$compose_file" pull 2>&1)"; then
+  if ! pull_output="$(_compose "$compose_file" pull 2>&1)"; then
     echo "[redeploy] ERROR: compose pull failed"
     echo "$pull_output"
     return 1
   fi
 
   echo "[redeploy] Running docker compose up -d..."
-  if ! up_output="$(docker compose -f "$compose_file" up -d 2>&1)"; then
+  if ! up_output="$(_compose "$compose_file" up -d 2>&1)"; then
     echo "[redeploy] ERROR: compose up failed"
     echo "$up_output"
     return 1
@@ -78,9 +88,9 @@ do_redeploy() {
     echo "[redeploy] ERROR: unhealthy services after redeploy:"
     echo "$unhealthy_services"
     echo "--- compose ps ---"
-    docker compose -f "$compose_file" ps
+    _compose "$compose_file" ps
     echo "--- logs (last 50 lines) ---"
-    docker compose -f "$compose_file" logs --tail=50
+    _compose "$compose_file" logs --tail=50
     return 1
   fi
 
@@ -107,7 +117,7 @@ retry_redeploy() {
 
   echo "[redeploy] Retry check #1 — still unhealthy. Attempting force-recreate..."
   local force_output
-  if ! force_output="$(docker compose -f "$compose_file" up -d --force-recreate 2>&1)"; then
+  if ! force_output="$(_compose "$compose_file" up -d --force-recreate 2>&1)"; then
     echo "[redeploy] ERROR: force-recreate failed"
     echo "$force_output"
     printf 'RETRY_OUTCOME=force_recreate_failed\nFORCE_OUTPUT=%s\n' "$force_output"
