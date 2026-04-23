@@ -2,14 +2,40 @@
 set -euo pipefail
 
 # Prints a human-readable table of all services: NAME  STATE  HEALTH  PORTS
+_detect_project_name() {
+  local compose_file="$1"
+  local services service project
+  # Get service names defined in the compose file
+  if [ -n "${COMPOSE_ENV_FILE:-}" ]; then
+    services="$(docker compose -f "$compose_file" --env-file "$COMPOSE_ENV_FILE" config --services 2>/dev/null || true)"
+  else
+    services="$(docker compose -f "$compose_file" config --services 2>/dev/null || true)"
+  fi
+  # Find a running container belonging to one of those services and read its project label
+  while IFS= read -r service; do
+    [ -z "$service" ] && continue
+    project="$(docker ps --filter "label=com.docker.compose.service=$service" \
+      --format '{{index .Labels "com.docker.compose.project"}}' 2>/dev/null | head -1)"
+    if [ -n "$project" ]; then
+      echo "$project"
+      return 0
+    fi
+  done <<< "$services"
+  return 1
+}
+
 _compose() {
   local compose_file="$1"
   shift
-  if [ -n "${COMPOSE_ENV_FILE:-}" ]; then
-    docker compose -f "$compose_file" --env-file "$COMPOSE_ENV_FILE" "$@"
-  else
-    docker compose -f "$compose_file" "$@"
+  local args=(-f "$compose_file")
+  [ -n "${COMPOSE_ENV_FILE:-}" ] && args+=(--env-file "$COMPOSE_ENV_FILE")
+  # Honour explicit override first, then auto-detect from running containers
+  local project_name="${CA_UPDATER_COMPOSE_PROJECT_NAME:-}"
+  if [ -z "$project_name" ]; then
+    project_name="$(_detect_project_name "$compose_file" 2>/dev/null || true)"
   fi
+  [ -n "$project_name" ] && args+=(--project-name "$project_name")
+  docker compose "${args[@]}" "$@"
 }
 
 compose_status() {

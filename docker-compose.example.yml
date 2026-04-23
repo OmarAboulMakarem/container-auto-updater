@@ -28,6 +28,8 @@ services:
       # COMPOSE_ENV_FILE: "/compose/.env"
       # Name of this watcher service in the compose file — excluded from pull/up to avoid self-conflict
       CA_UPDATER_SERVICE_NAME: "container-auto-updater"
+      # Optional: override the auto-detected compose project name
+      # CA_UPDATER_COMPOSE_PROJECT_NAME: "my-project"
       CA_UPDATER_PROJECT_NAME: "my-app"
       CHECK_INTERVAL_MINUTES: "5"
       SKIP_FIRST_RUN: "true"
