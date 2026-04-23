@@ -21,23 +21,18 @@ _send_sendgrid() {
   local subject="$1"
   local body="$2"
 
-  local to_array
-  to_array="$(
-    echo "$EMAIL_TO" | tr ',' '\n' | while read -r addr; do
-      addr="$(echo "$addr" | xargs)"
-      [ -z "$addr" ] && continue
-      printf '{"email":"%s"}' "$addr"
-    done | paste -sd ','
-  )"
-
+  # Build recipients array entirely in jq — avoids shell string-building issues
+  # with special characters in addresses or single-address edge cases
   local payload
   payload="$(jq -nc \
     --arg from "$EMAIL_FROM" \
     --arg subject "$subject" \
     --arg body "$body" \
-    --argjson to "[$to_array]" \
+    --arg to_raw "$EMAIL_TO" \
     '{
-      personalizations: [{ to: $to }],
+      personalizations: [{
+        to: ($to_raw | split(",") | map(ltrimstr(" ") | rtrimstr(" ")) | map(select(length > 0)) | map({email: .}))
+      }],
       from: { email: $from },
       subject: $subject,
       content: [{ type: "text/plain", value: $body }]

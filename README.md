@@ -198,11 +198,11 @@ The registry is detected automatically from the image hostname — no config nee
 
 | Event | Subject | Body contains |
 |---|---|---|
-| Redeploy succeeded | `[CU] <project> — redeployed successfully` | Image ref, old/new digest, timestamp, container status table |
-| Redeploy failed | `[CU] <project> — REDEPLOY FAILED` | Status table, redeploy output, last 20 lines of logs per failing service, recovery notice |
-| Recovered automatically | `[CU] <project> — recovered automatically` | Status table |
-| Recovered via force-recreate | `[CU] <project> — recovered via force-recreate` | Force-recreate output, status table |
-| Still failing after all attempts | `[CU] <project> — STILL FAILING after force-recreate` | Status table, last 20 lines of logs per failing service |
+| Redeploy succeeded | `[ca-updater] <project> — redeployed successfully` | Image ref, old/new digest, timestamp, container status table |
+| Redeploy failed | `[ca-updater] <project> — REDEPLOY FAILED` | Status table, redeploy output, last 20 lines of logs per failing service, recovery notice |
+| Recovered automatically | `[ca-updater] <project> — recovered automatically` | Status table |
+| Recovered via force-recreate | `[ca-updater] <project> — recovered via force-recreate` | Force-recreate output, status table |
+| Still failing after all attempts | `[ca-updater] <project> — STILL FAILING after force-recreate` | Status table, last 20 lines of logs per failing service |
 
 A notification failure is logged but never crashes the watcher.
 

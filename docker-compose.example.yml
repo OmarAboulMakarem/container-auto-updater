@@ -18,6 +18,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /path/to/your/docker-compose.yml:/compose/docker-compose.yml:ro
+      - auto_updater_docker_config:/root/.docker
     environment:
       WATCH_IMAGES: "your-registry/your-repo:latest"
       COMPOSE_FILE: "/compose/docker-compose.yml"
@@ -34,3 +35,7 @@ services:
       OCIR_AUTH_TOKEN: "${OCIR_AUTH_TOKEN}"
       DOCKERHUB_USERNAME: "${DOCKERHUB_USERNAME}"
       DOCKERHUB_TOKEN: "${DOCKERHUB_TOKEN}"
+
+volumes:
+  auto_updater_docker_config:
+    driver: local
