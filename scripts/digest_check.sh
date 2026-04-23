@@ -5,8 +5,8 @@ remote_digest() {
   local image_ref="$1"
   local attempt digest
   for attempt in 1 2 3; do
-    digest="$(docker buildx imagetools inspect --format '{{json .Manifest}}' "$image_ref" 2>/dev/null \
-      | jq -r '.digest // empty')"
+    digest="$(docker manifest inspect "$image_ref" 2>/dev/null \
+      | jq -r '.config.digest // (.manifests[0].digest) // empty')"
     [ -n "$digest" ] && { echo "$digest"; return 0; }
     [ "$attempt" -lt 3 ] && sleep 5
   done

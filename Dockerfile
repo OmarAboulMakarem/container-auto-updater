@@ -6,12 +6,10 @@ RUN apk add --no-cache \
       jq \
       docker-cli \
       docker-cli-compose \
-      docker-buildx \
       python3 \
       py3-pip \
       groff \
       less \
-      unzip \
     && pip3 install --no-cache-dir --break-system-packages awscli \
     && rm -rf /var/cache/apk/*
 

@@ -8,3 +8,6 @@
 # Internal tooling / plans — not relevant to public users
 docs/
 .claude/
+
+# Internal CI (GitLab-specific, not needed on GitHub)
+.gitlab-ci.yml
