@@ -68,19 +68,33 @@ verify_health() {
   fi
 }
 
+_target_services() {
+  local compose_file="$1"
+  local all_services excluded service target_services=()
+  all_services="$(_compose "$compose_file" config --services 2>/dev/null || true)"
+  excluded="${CA_UPDATER_SERVICE_NAME:-container-auto-updater}"
+  while IFS= read -r service; do
+    [ "$service" = "$excluded" ] && continue
+    target_services+=("$service")
+  done <<< "$all_services"
+  echo "${target_services[@]}"
+}
+
 do_redeploy() {
   local compose_file="$1"
   local pull_output up_output
+  local -a services
+  read -ra services <<< "$(_target_services "$compose_file")"
 
   echo "[redeploy] Pulling images..."
-  if ! pull_output="$(_compose "$compose_file" pull 2>&1)"; then
+  if ! pull_output="$(_compose "$compose_file" pull "${services[@]}" 2>&1)"; then
     echo "[redeploy] ERROR: compose pull failed"
     echo "$pull_output"
     return 1
   fi
 
   echo "[redeploy] Running docker compose up -d..."
-  if ! up_output="$(_compose "$compose_file" up -d 2>&1)"; then
+  if ! up_output="$(_compose "$compose_file" up -d "${services[@]}" 2>&1)"; then
     echo "[redeploy] ERROR: compose up failed"
     echo "$up_output"
     return 1
@@ -123,7 +137,9 @@ retry_redeploy() {
 
   echo "[redeploy] Retry check #1 — still unhealthy. Attempting force-recreate..."
   local force_output
-  if ! force_output="$(_compose "$compose_file" up -d --force-recreate 2>&1)"; then
+  local -a services
+  read -ra services <<< "$(_target_services "$compose_file")"
+  if ! force_output="$(_compose "$compose_file" up -d --force-recreate "${services[@]}" 2>&1)"; then
     echo "[redeploy] ERROR: force-recreate failed"
     echo "$force_output"
     printf 'RETRY_OUTCOME=force_recreate_failed\nFORCE_OUTPUT=%s\n' "$force_output"

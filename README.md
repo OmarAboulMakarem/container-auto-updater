@@ -138,6 +138,7 @@ The registry is detected automatically from the image hostname — no config nee
 |---|---|---|
 | `CA_UPDATER_PROJECT_NAME` | Parent dir of `COMPOSE_FILE` | Project name shown in email subjects. Set this explicitly — the default resolves to `compose` when using the recommended mount path. |
 | `COMPOSE_ENV_FILE` | — | Path to a `.env` file **inside the watcher container** passed to all `docker compose` commands via `--env-file`. Required if your compose file uses `required` variable syntax (e.g. `${VAR:?}`). Mount your app's `.env` and set this to the mount path. |
+| `CA_UPDATER_SERVICE_NAME` | `container-auto-updater` | Name of the watcher service in your compose file. This service is excluded from `pull` and `up` at redeploy time to prevent a self-conflict (the running watcher can't be replaced by itself mid-run). |
 | `CHECK_INTERVAL_MINUTES` | `5` | How often to poll registries, in minutes |
 | `SKIP_FIRST_RUN` | `false` | Set to `true` to skip the redeploy check on first startup, preventing a spurious redeploy every time the watcher container restarts |
 
