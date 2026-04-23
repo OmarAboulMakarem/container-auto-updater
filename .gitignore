@@ -1,0 +1,10 @@
+# Secrets
+.env
+.env.local
+.env.production
+.env.staging
+*.local
+
+# Internal tooling / plans — not relevant to public users
+docs/
+.claude/

@@ -1,0 +1,36 @@
+# docker-compose.example.yml
+# Shows how to run the auto-pull watcher alongside your application.
+# Copy this, fill in the env vars, and mount your actual compose file.
+
+services:
+  # Your application — example only
+  app:
+    image: your-registry/your-repo:latest
+    restart: unless-stopped
+
+  # Container-Auto-Update watcher
+  container-auto-update:
+    image: ghcr.io/omaraboulmakarem/container-auto-update:latest
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /path/to/your/docker-compose.yml:/compose/docker-compose.yml:ro
+    environment:
+      WATCH_IMAGES: "your-registry/your-repo:latest"
+      COMPOSE_FILE: "/compose/docker-compose.yml"
+      COMPOSE_PROJECT_NAME: "my-app"
+      CHECK_INTERVAL_MINUTES: "5"
+      SKIP_FIRST_RUN: "true"
+      SENDGRID_API_KEY: "${SENDGRID_API_KEY}"
+      EMAIL_FROM: "alerts@yourdomain.com"
+      EMAIL_TO: "ops@yourdomain.com,oncall@yourdomain.com"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_REGION: "us-east-1"
+      OCIR_USERNAME: "${OCIR_USERNAME}"
+      OCIR_AUTH_TOKEN: "${OCIR_AUTH_TOKEN}"
+      DOCKERHUB_USERNAME: "${DOCKERHUB_USERNAME}"
+      DOCKERHUB_TOKEN: "${DOCKERHUB_TOKEN}"
