@@ -21,7 +21,7 @@ services:
     environment:
       WATCH_IMAGES: "your-registry/your-repo:latest"
       COMPOSE_FILE: "/compose/docker-compose.yml"
-      COMPOSE_PROJECT_NAME: "my-app"
+      CAU_PROJECT_NAME: "my-app"
       CHECK_INTERVAL_MINUTES: "5"
       SKIP_FIRST_RUN: "true"
       SENDGRID_API_KEY: "${SENDGRID_API_KEY}"
