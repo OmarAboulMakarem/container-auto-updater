@@ -14,13 +14,19 @@ _compose() {
 
 compose_status() {
   local compose_file="$1"
-  _compose "$compose_file" ps --format json 2>/dev/null \
+  local json
+  if ! json="$(_compose "$compose_file" ps --format json 2>&1)"; then
+    echo "(could not retrieve service status: $json)"
+    return
+  fi
+  echo "$json" \
     | jq -r 'if type == "array" then .[] else . end
              | [.Name, .State, (if .Health == "" then "-" else .Health end), (if .Publishers then (.Publishers | map(.PublishedPort | tostring) | join(",")) else "-" end)]
              | @tsv' \
     | awk 'BEGIN{printf "%-40s %-10s %-12s %s\n","SERVICE","STATE","HEALTH","PORTS"
                  printf "%-40s %-10s %-12s %s\n","-------","-----","------","-----"}
-           {printf "%-40s %-10s %-12s %s\n",$1,$2,$3,$4}' || echo "(could not retrieve service status)"
+           {printf "%-40s %-10s %-12s %s\n",$1,$2,$3,$4}' \
+  || echo "(could not retrieve service status)"
 }
 
 # Prints last N lines of logs for each unhealthy/stopped service.

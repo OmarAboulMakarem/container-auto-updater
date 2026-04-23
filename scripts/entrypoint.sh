@@ -104,7 +104,7 @@ New     : %s
 All containers are running:
 
 %s' \
-        "$COMPOSE_PROJECT" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+        "$COMPOSE_PROJECT" "$(date -u +"%a, %d %b %Y %H:%M:%S UTC")" \
         "$image_ref" "$old_short" "$new_short" \
         "$(compose_status "$COMPOSE_FILE")")"
       send_email "$subject" "$body" || true
@@ -135,7 +135,7 @@ Logs from failing services:
 %s
 
 Recovery in progress: will recheck in 2 min, then force-recreate if still unhealthy.' \
-      "$COMPOSE_PROJECT" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+      "$COMPOSE_PROJECT" "$(date -u +"%a, %d %b %Y %H:%M:%S UTC")" \
       "$image_ref" "$old_short" "$new_short" \
       "$(compose_status "$COMPOSE_FILE")" \
       "$redeploy_output" \
@@ -168,7 +168,7 @@ No force-recreate was needed.
 Current container status:
 
 %s' \
-            "$COMPOSE_PROJECT" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" "$image_ref" \
+            "$COMPOSE_PROJECT" "$(date -u +"%a, %d %b %Y %H:%M:%S UTC")" "$image_ref" \
             "$(compose_status "$COMPOSE_FILE")")"
           ;;
         force_recreate_succeeded)
@@ -189,7 +189,7 @@ Force-recreate output:
 Current container status:
 
 %s' \
-            "$COMPOSE_PROJECT" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" "$image_ref" \
+            "$COMPOSE_PROJECT" "$(date -u +"%a, %d %b %Y %H:%M:%S UTC")" "$image_ref" \
             "$force_output" \
             "$(compose_status "$COMPOSE_FILE")")"
           ;;
@@ -226,7 +226,7 @@ Current container status:
 Logs from failing services:
 
 %s' \
-        "$COMPOSE_PROJECT" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" "$image_ref" \
+        "$COMPOSE_PROJECT" "$(date -u +"%a, %d %b %Y %H:%M:%S UTC")" "$image_ref" \
         "$force_output" \
         "$(compose_status "$COMPOSE_FILE")" \
         "$(failing_service_logs "$COMPOSE_FILE" 20)")"
